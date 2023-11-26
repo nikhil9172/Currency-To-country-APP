@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Currency to Country Lookup</title>
+    <!-- inside the style tag we gave the style of the web applicaation -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #efffff;
+        }
+
+        #search-bar {
+            padding: 10px;
+            font-size: 16px;
+           
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        .country {
+            display: inline-block;
+            margin: 70px;
+        }
+
+        .flag {
+            width: 100px;
+            height: auto;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- inside the body tag we gave the structure of the web applicatin -->
+
+    <h1>Currency to Country </h1>
+
+    <input style="margin-top: 20px;" type="text" id="search-bar" placeholder="Enter currency...">
+    <button onclick="search()" style="background-color: #d0f9f9;     width: 74px;
+    height: 40px;">Search</button>
+
+    <div id="results"></div>
+<!-- inside the script tag we wrote the javascrit code for the more intractive web application -->
+    <script>
+        function search() {
+            var currencyCode = document.getElementById('search-bar').value.toUpperCase();
+            var resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '';
+
+           
+            fetch(`https://restcountries.com/v3.1/currency/${currencyCode}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        resultsDiv.innerHTML = `<p>${data.error}</p>`;
+                    } else {
+                        data.forEach(country => {
+                            var countryCode = country.cca2.toLowerCase();
+                            var flagUrl = `https://flagsapi.com/${countryCode.toUpperCase()}/flat/64.png`;
+                          
+                            var countryName = country.name.common;
+                            var countryCapital =country.capital;
+
+                         
+                            if (!countryCode) {
+                                countryCode = 'unknown';
+                            }
+
+                            
+                            if (!flagUrl) {
+                                flagUrl = 'https://via.placeholder.com/30x20';
+                            }
+
+                            resultsDiv.innerHTML += `
+                                <div class="country">
+                                    <img class="flag" src=${flagUrl} alt="${countryName} flag">
+                                    <p>${countryName}</p>
+                                    <p>Capital: ${countryCapital}</p>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    resultsDiv.innerHTML = '<p>Error fetching data. Please try again later.</p>';
+                });
+        }
+    </script>
+
+</body>
+</html>
